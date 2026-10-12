@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NutriPlan.API.DTOs;
+using NutriPlan.API.Extensions;
 using NutriPlan.Core.Entities;
 using NutriPlan.Infrastructure.Data;
 
 namespace NutriPlan.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ProfilesController : ControllerBase
@@ -20,12 +23,13 @@ namespace NutriPlan.API.Controllers
         [HttpPost]
         public async Task<ActionResult<ProfileResponseDto>> CreateProfile(CreateProfileDto request)
         {
-            var profileExists = await _context.Profiles.AnyAsync(p => p.UserId == request.UserId);
+            var userId = User.GetUserId();
+            var profileExists = await _context.Profiles.AnyAsync(p => p.UserId == userId);
             if (profileExists)
             {
                 return Conflict("El usuario ya tiene un perfil biológico creado. Usa el endpoint PUT para actualizarlo.");
             }
-            var userExists = await _context.Users.AnyAsync(u => u.UserId == request.UserId);
+            var userExists = await _context.Users.AnyAsync(u => u.UserId == userId);
             if (!userExists)
             {
                 return NotFound("El usuario especificado no existe en el sistema de autenticación.");
@@ -42,7 +46,7 @@ namespace NutriPlan.API.Controllers
             }
             var newProfile = new Profile
             {
-                UserId = request.UserId,
+                UserId = userId,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
                 BirthDate = request.BirthDate,
@@ -51,8 +55,8 @@ namespace NutriPlan.API.Controllers
                 WeightKg = request.WeightKg,
                 ActivityLevel = request.ActivityLevel
             };
-            var userAllergies = allergyIds.Select(id => new UserAllergy { UserId = request.UserId, AllergyId = id });
-            var userDiseases = diseaseIds.Select(id => new UserDisease { UserId = request.UserId, DiseaseId = id });
+            var userAllergies = allergyIds.Select(id => new UserAllergy { UserId = userId, AllergyId = id });
+            var userDiseases = diseaseIds.Select(id => new UserDisease { UserId = userId, DiseaseId = id });
 
             _context.Profiles.Add(newProfile);
             _context.UserAllergies.AddRange(userAllergies);

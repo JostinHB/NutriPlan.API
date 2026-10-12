@@ -84,6 +84,14 @@ namespace NutriPlan.Infrastructure.Data
                 .HasOne(u => u.Profile)
                 .WithOne(p => p.User)
                 .HasForeignKey<Profile>(p => p.UserId);
+            modelBuilder.Entity<MealPlanItem>()
+                .HasKey(mpi => mpi.MealPlanItemId);
+
+            modelBuilder.Entity<MealPlanItem>()
+                .HasOne(mpi => mpi.MealPlan)
+                .WithMany(mp => mp.Items)
+                .HasForeignKey(mpi => mpi.PlanId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

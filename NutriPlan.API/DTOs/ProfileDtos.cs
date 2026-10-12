@@ -3,7 +3,7 @@
 namespace NutriPlan.API.DTOs
 {
     public record CreateProfileDto(
-        [Required] int UserId,
+        
         [Required, MaxLength(100)] string FirstName,
         [Required, MaxLength(100)] string LastName,
         DateTime? BirthDate,
