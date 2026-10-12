@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="NutriPlan.API/NutriPlan.API.csproj" />
+  <Project Path="NutriPlan.Core/NutriPlan.Core.csproj" />
+  <Project Path="NutriPlan.Infrastructure/NutriPlan.Infrastructure.csproj" />
+</Solution>
